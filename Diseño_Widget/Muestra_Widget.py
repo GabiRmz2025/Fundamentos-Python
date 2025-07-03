@@ -6,7 +6,7 @@ from tkinter import messagebox
 import csv
 import os #Este se usa para saber si ya existe un archivo
 
-#Función para limbiar el formulario, cuando se presione el botón Cancelar o Aceptar
+#Función para limpiar el formulario (widget), cuando se presione el botón Limpiar o después de Guardar
 def limpiar(*args):
     txtNombre.delete(0, tk.END)
     txtA_Paterno.delete(0, tk.END)
@@ -27,8 +27,8 @@ def guardar_datos(*args):
     archivo_existe = os.path.isfile("Datos_Archivo.csv") #metodo investigado en Libro de Python y youtube
 
     try:
-        with open("Datos_Archivo.csv", mode="a", newline="", encoding="utf-8") as archivo:
-            rotulo = csv.writer(archivo)
+        with open("Datos_Archivo.csv", mode="a", newline="", encoding="utf-8") as archivo_guardado:
+            rotulo = csv.writer(archivo_guardado)
             if not archivo_existe:
                 rotulo.writerow(["Nombre", "Apellido_Paterno", "Apellido_Materno",
                                    "Correo", "Telefono_Móvil", "Tipo_Persona",
@@ -40,7 +40,25 @@ def guardar_datos(*args):
     except Exception as e:
         messagebox.showerror("Error", f"No se pudieron guardar los datos:\n {e}")
 
-    
+#Función para mostrar el contenido de "Datos_Archivo.csv" en la terminal
+def consultar():
+    consulta_archivo = "Datos_Archivo.csv"
+
+    if not os.path.isfile(consulta_archivo):
+        print("Datos_Archivo.csv, NO EXISTE")
+        return
+
+    try:
+        with open(consulta_archivo, mode="r", encoding="utf-8") as archivo:
+            lectura = csv.reader(archivo)
+            for fila in lectura:
+                print(" | ".join(fila)) #metódo para concatenar strings y poner un separador |
+    except Exception as error_leer:
+        print(f"Ocurrió un error al leer 'Datos_Archivo.csv':", {error_leer})
+
+#Función para cerrar la ventana principal y sus widgets
+def cerrar():
+    raiz.destroy()
     
 #Inicio con los Marcos
 raiz =  Tk() #siempre nuestro objeto principal es Tk(), es raiz. Es la ventana principal
@@ -141,7 +159,9 @@ frame_GC = ttk.Frame(marco_inferior, padding=3)
 frame_GC.pack(side="left" , expand=True, fill="both", padx=5, pady=5)
 
 ttk.Button(frame_GC, command=guardar_datos, text="Guardar").place(relx=0.0, rely=0.5, anchor="w")
-ttk.Button(frame_GC, command=limpiar, text="Cancelar").place(relx=0.5, rely=0.5, anchor="w")
+ttk.Button(frame_GC, command=limpiar, text="Limpiar").place(relx=0.2, rely=0.5, anchor="w")
+ttk.Button(frame_GC, command=consultar, text="Mostrar Terminal").place(relx=0.4, rely=0.5, anchor="w")
+ttk.Button(frame_GC, command=cerrar, text="Cerrar").place(relx=0.7, rely=0.5, anchor="c")
 
 for child in marcoPrincipal.winfo_children():
     child.pack(fill="both", expand=True)
